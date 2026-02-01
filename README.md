@@ -16,3 +16,26 @@ pip install -e .
 quant-sim backtest --config configs/backtest.yaml
 quant-sim paper --config configs/paper_coinbase.yaml
 Artifacts are written to runs/<timestamp>_runid-.../ (csv + report.html).
+
+## Web Service (Docker + Local)
+
+Local run:
+
+```bash
+node index.js
+# or
+PORT=8080 node index.js
+```
+
+Docker build + run:
+
+```bash
+docker build -t tradingqquant-sim .
+docker run --rm -p 8080:8080 tradingqquant-sim
+```
+
+Health check:
+
+```bash
+curl -i http://localhost:8080/healthz
+```
