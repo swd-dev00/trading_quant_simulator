@@ -1,0 +1,62 @@
+name: Build & Push Docker image to ECR
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: ecr-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  AWS_REGION: us-east-1
+  # Example: 123456789012.dkr.ecr.us-east-1.amazonaws.com
+  ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+  # Example: trading-quant-sim
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Recommended: use OIDC role assumption instead of long-lived AWS keys
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set image tags
+        id: vars
+        run: |
+          echo "sha_tag=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+          echo "latest_tag=latest" >> $GITHUB_OUTPUT
+
+      - name: Build, tag, and push
+        run: |
+          IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}"
+
+          docker build \
+            -t "${IMAGE_URI}:${{ steps.vars.outputs.sha_tag }}" \
+            -t "${IMAGE_URI}:${{ steps.vars.outputs.latest_tag }}" \
+            .
+
+          docker push "${IMAGE_URI}:${{ steps.vars.outputs.sha_tag }}"
+          docker push "${IMAGE_URI}:${{ steps.vars.outputs.latest_tag }}"
+
+      - name: Output image
+        run: |
+          echo "Pushed: ${ECR_REGISTRY}/${ECR_REPOSITORY}:${GITHUB_SHA}"
+          echo "Pushed: ${ECR_REGISTRY}/${ECR_REPOSITORY}:latest"
