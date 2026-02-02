@@ -28,3 +28,15 @@ const server = http.createServer((req, res) => {
 server.listen(port, host, () => {
   console.log(`[startup] server listening on http://${host}:${port}`);
 });
+
+// Graceful shutdown handlers for containerized environments
+function gracefulShutdown(signal) {
+  console.log(`[shutdown] received ${signal}, closing server gracefully`);
+  server.close(() => {
+    console.log('[shutdown] server closed, exiting process');
+    process.exit(0);
+  });
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
