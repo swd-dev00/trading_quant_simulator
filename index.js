@@ -11,7 +11,6 @@ const host = '0.0.0.0';
 
 const server = http.createServer((req, res) => {
   const { method, url } = req;
-  const pathname = new URL(url, `http://${host}`).pathname;
   
   // Add error handlers for request and response streams
   req.on('error', (err) => {
@@ -21,6 +20,8 @@ const server = http.createServer((req, res) => {
   res.on('error', (err) => {
     console.error('[response error]', err);
   });
+  
+  const pathname = new URL(url, 'http://localhost').pathname;
   
   res.on('finish', () => {
     console.log(`[request] ${method} ${url} -> ${res.statusCode}`);
