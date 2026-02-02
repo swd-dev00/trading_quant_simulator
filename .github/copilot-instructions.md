@@ -23,7 +23,7 @@ docker run -p 8000:8000 tradingq-app:latest
 ```
 
 ### Testing
-Currently, tests are not specified in the repository. If adding tests, use pytest:
+No test suite is currently configured in the repository. If adding tests, use pytest:
 ```bash
 pip install pytest
 pytest
