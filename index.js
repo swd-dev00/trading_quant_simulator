@@ -28,3 +28,20 @@ const server = http.createServer((req, res) => {
 server.listen(port, host, () => {
   console.log(`[startup] server listening on http://${host}:${port}`);
 });
+
+server.on('error', (err) => {
+  console.error('[error]', err);
+  process.exit(1);
+});
+
+// Graceful shutdown handlers
+const shutdown = (signal) => {
+  console.log(`[shutdown] received ${signal}, closing server gracefully`);
+  server.close(() => {
+    console.log('[shutdown] server closed, exiting process');
+    process.exit(0);
+  });
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
