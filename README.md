@@ -30,8 +30,8 @@ PORT=8080 node index.js
 Docker build + run:
 
 ```bash
-docker build -t tradingqquant-sim .
-docker run --rm -p 8080:8080 tradingqquant-sim
+docker build -t trading-quant-sim .
+docker run --rm -p 8080:8080 trading-quant-sim
 ```
 
 Health check:
