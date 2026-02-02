@@ -2,6 +2,7 @@ const http = require('http');
 
 const port = Number.parseInt(process.env.PORT, 10) || 8080;
 const host = '0.0.0.0';
+const SHUTDOWN_TIMEOUT_MS = 10000;
 
 const server = http.createServer((req, res) => {
   const { method, url } = req;
@@ -37,10 +38,17 @@ function gracefulShutdown(signal) {
   const shutdownTimeout = setTimeout(() => {
     console.error('[shutdown] forced exit after timeout');
     process.exit(1);
-  }, 10000);
+  }, SHUTDOWN_TIMEOUT_MS);
   
-  server.close(() => {
+  // Allow process to exit naturally if server closes before timeout
+  shutdownTimeout.unref();
+  
+  server.close((err) => {
     clearTimeout(shutdownTimeout);
+    if (err) {
+      console.error('[shutdown] error closing server:', err.message);
+      process.exit(1);
+    }
     console.log('[shutdown] server closed, exiting process');
     process.exit(0);
   });
