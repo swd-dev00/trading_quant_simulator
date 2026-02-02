@@ -33,3 +33,28 @@ const server = http.createServer((req, res) => {
 server.listen(port, host, () => {
   console.log(`[startup] server listening on http://${host}:${port}`);
 });
+
+server.on('error', (err) => {
+  console.error('[error]', err);
+  process.exit(1);
+});
+
+// Graceful shutdown handlers
+const shutdown = (signal) => {
+  console.log(`[shutdown] received ${signal}, closing server gracefully`);
+  
+  // Force shutdown after timeout if graceful shutdown doesn't complete
+  const forceShutdownTimeout = setTimeout(() => {
+    console.error('[shutdown] graceful shutdown timed out, forcing exit');
+    process.exit(1);
+  }, 30000); // 30 second timeout
+  
+  server.close(() => {
+    clearTimeout(forceShutdownTimeout);
+    console.log('[shutdown] server closed, exiting process');
+    process.exit(0);
+  });
+};
+
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));
