@@ -54,7 +54,7 @@ process.on('SIGTERM', () => {
   
   const shutdownTimeout = setTimeout(() => {
     console.error('[shutdown] graceful shutdown timeout exceeded, forcing exit');
-    process.exit(0);
+    process.exit(1);
   }, SHUTDOWN_TIMEOUT_MS);
   shutdownTimeout.unref();
   
