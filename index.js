@@ -10,6 +10,8 @@ const host = '0.0.0.0';
 
 const SHUTDOWN_TIMEOUT_MS = 30000;
 
+let isShuttingDown = false;
+
 const server = http.createServer((req, res) => {
   const { method, url } = req;
   res.on('finish', () => {
@@ -42,11 +44,17 @@ server
   });
 
 process.on('SIGTERM', () => {
+  if (isShuttingDown) {
+    console.log('[shutdown] SIGTERM received again, shutdown already in progress');
+    return;
+  }
+  isShuttingDown = true;
+  
   console.log('[shutdown] SIGTERM received, closing server gracefully');
   
   const shutdownTimeout = setTimeout(() => {
     console.error('[shutdown] graceful shutdown timeout exceeded, forcing exit');
-    process.exit(1);
+    process.exit(0);
   }, SHUTDOWN_TIMEOUT_MS);
   shutdownTimeout.unref();
   
