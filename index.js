@@ -38,3 +38,11 @@ server
     console.error('[startup] failed to start server:', err);
     process.exit(1);
   });
+
+process.on('SIGTERM', () => {
+  console.log('[shutdown] SIGTERM received, closing server gracefully');
+  server.close(() => {
+    console.log('[shutdown] server closed, exiting process');
+    process.exit(0);
+  });
+});
