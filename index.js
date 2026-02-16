@@ -8,6 +8,8 @@ const port =
     : 8080;
 const host = '0.0.0.0';
 
+const SHUTDOWN_TIMEOUT_MS = 30000;
+
 const server = http.createServer((req, res) => {
   const { method, url } = req;
   res.on('finish', () => {
@@ -45,7 +47,8 @@ process.on('SIGTERM', () => {
   const shutdownTimeout = setTimeout(() => {
     console.error('[shutdown] graceful shutdown timeout exceeded, forcing exit');
     process.exit(1);
-  }, 30000);
+  }, SHUTDOWN_TIMEOUT_MS);
+  shutdownTimeout.unref();
   
   server.close((err) => {
     clearTimeout(shutdownTimeout);
