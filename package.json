@@ -17,8 +17,8 @@
   "engines": {
     "node": ">=14"
   },
-  "dependencies": {
-    "react-native": "latest"
-  },
-  "devDependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  }
 }
