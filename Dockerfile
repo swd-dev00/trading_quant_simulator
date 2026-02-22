@@ -1,16 +1,15 @@
-FROM python:3.11-slim
+FROM node:20-alpine
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+RUN chown -R node:node /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+USER node
 
-COPY . .
+COPY --chown=node:node index.js package.json ./
 
-EXPOSE 8000
+RUN npm install --production
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 8080
+
+CMD ["node", "index.js"]
