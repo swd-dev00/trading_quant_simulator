@@ -13,7 +13,7 @@ const server = http.createServer((req, res) => {
   const { method, url } = req;
   const pathname = new URL(url, 'http://localhost').pathname;
   res.on('finish', () => {
-    console.log(`[request] ${method} ${url} -> ${res.statusCode}`);
+    console.log(`[request] ${method} ${pathname} -> ${res.statusCode}`);
   });
 
   if (method === 'GET' && pathname === '/') {
