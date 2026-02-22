@@ -6,7 +6,7 @@ RUN chown -R node:node /app
 
 USER node
 
-COPY index.js package.json ./
+COPY --chown=node:node index.js package.json ./
 
 RUN npm install --production
 
