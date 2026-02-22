@@ -1,9 +1,11 @@
-FROM node:20.11.1-alpine3.19
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY index.js package.json ./
+COPY --chown=node:node index.js package.json ./
 RUN npm install --production
+
+USER node
 
 EXPOSE 8080
 
