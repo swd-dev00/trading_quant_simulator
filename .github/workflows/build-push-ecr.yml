@@ -2,43 +2,33 @@ name: Build and Push to ECR
 
 on:
   push:
-    branches: ["main"]
-
-permissions:
-  contents: read
+    branches:
+      - main
+      - master
 
 jobs:
-  build_push:
+  build:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
-      - name: Configure AWS creds
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: us-east-1
+          role-to-assume: arn:aws:iam::160768284037:role/GitHubActions-tradingqquant-ECR-Role
+          id-token: write
 
-      - name: Login to ECR
-        uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build, tag, push
-        env:
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          REPO_NAME: tradingq-app
+      - name: Build Docker Image
         run: |
-          set -euo pipefail
-          IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}"
-          TAG="${GITHUB_SHA}"
-          docker build -t "${REPO_NAME}:${TAG}" .
-          docker tag "${REPO_NAME}:${TAG}" "${IMAGE_URI}:${TAG}"
-          docker tag "${REPO_NAME}:${TAG}" "${IMAGE_URI}:latest"
-          docker push "${IMAGE_URI}:${TAG}"
-          docker push "${IMAGE_URI}:latest"
-          echo "IMAGE=${IMAGE_URI}:${TAG}" >> $GITHUB_ENV
+          docker build -t my-image:${{ github.sha }} .
+          docker tag my-image:${{ github.sha }} my-image:latest
 
-      - name: Output image
-        run: echo "Pushed $IMAGE"
+      - name: Push Docker Image
+        run: |
+          docker push my-image:${{ github.sha }}
+          docker push my-image:latest
