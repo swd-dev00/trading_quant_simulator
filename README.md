@@ -1,4 +1,5 @@
 # Quant Simulator (Research → Backtest → Paper (Coinbase) → Reports)
+> Note: Astrid branch artifacts are intentionally excluded from this repository snapshot.
 
 A modular quant trading research and paper-trading framework with:
 
