@@ -1,1 +1,59 @@
+name: Build and Push to ECR
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  build_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Sanitize AWS credentials
+        env:
+          RAW_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          RAW_SECRET: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          RAW_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          clean_key_id=$(printf '%s' "$RAW_KEY_ID" | tr -d '[:space:]')
+          clean_secret=$(printf '%s' "$RAW_SECRET" | tr -d '[:space:]')
+          clean_region=$(printf '%s' "$RAW_REGION" | tr -d '[:space:]')
+          echo "::add-mask::$clean_key_id"
+          echo "::add-mask::$clean_secret"
+          echo "AWS_ACCESS_KEY_ID=$clean_key_id" >> "$GITHUB_ENV"
+          echo "AWS_SECRET_ACCESS_KEY=$clean_secret" >> "$GITHUB_ENV"
+          echo "AWS_REGION=$clean_region" >> "$GITHUB_ENV"
+
+      - name: Configure AWS creds
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, push
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          REPO_NAME: tradingq-app
+        run: |
+          set -euo pipefail
+          IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${REPO_NAME}"
+          TAG="${GITHUB_SHA}"
+          docker build -t "${REPO_NAME}:${TAG}" .
+          docker tag "${REPO_NAME}:${TAG}" "${IMAGE_URI}:${TAG}"
+          docker tag "${REPO_NAME}:${TAG}" "${IMAGE_URI}:latest"
+          docker push "${IMAGE_URI}:${TAG}"
+          docker push "${IMAGE_URI}:latest"
+          echo "IMAGE=${IMAGE_URI}:${TAG}" >> $GITHUB_ENV
+
+      - name: Output image
+        run: echo "Pushed $IMAGE"
 # Configure AWS credentials for GitHub Actions\n\nname: Build and Push to ECR\n\non: [push, pull_request]\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout code\n        uses: actions/checkout@v2\n\n      - name: Configure AWS Credentials\n        uses: aws-actions/configure-aws-credentials@v1\n        with:\n          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}\n          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}\n          aws-region: us-east-1\n\n      - name: Build Docker image\n        run: docker build . -t my-image\n\n      - name: Authenticate to Amazon ECR\n        run: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.us-east-1.amazonaws.com\n\n      - name: Push to Amazon ECR\n        run: docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/my-image\n
