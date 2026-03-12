@@ -1,1 +1,7 @@
+<<<<<<< HEAD
 node_modules/
+=======
+*.log
+.idx/mcp.json
+.idx/Tqs
+>>>>>>> e67b7b7 (chore: Add .gitignore)
