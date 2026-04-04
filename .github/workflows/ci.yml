@@ -14,13 +14,47 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Resolve Node project directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f package.json ]]; then
+            echo "PROJECT_DIR=." >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          if [[ -f TradingQuant-Sim.zip ]]; then
+            rm -rf _ci_extract
+            unzip -q TradingQuant-Sim.zip -d _ci_extract
+            if [[ -f _ci_extract/TradingQuant-Sim/package.json ]]; then
+              echo "PROJECT_DIR=_ci_extract/TradingQuant-Sim" >> "$GITHUB_ENV"
+              exit 0
+            fi
+          fi
+
+          echo "PROJECT_DIR=" >> "$GITHUB_ENV"
+
       - name: Setup Node
+        if: ${{ env.PROJECT_DIR != '' }}
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: ${{ env.PROJECT_DIR }}/package-lock.json
 
       - name: Install dependencies
+        if: ${{ env.PROJECT_DIR != '' }}
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: npm ci
+
+      - name: Lint
+        if: ${{ env.PROJECT_DIR != '' }}
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: npm run lint
+
+      - name: Run tests
+        if: ${{ env.PROJECT_DIR != '' }}
+        working-directory: ${{ env.PROJECT_DIR }}
         if: ${{ hashFiles('package.json') != '' }}
         run: npm ci
 
