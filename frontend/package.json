@@ -15,5 +15,12 @@
   },
   "devDependencies": {
     "vite": "^5.4.19"
+  "name": "tqs-gamma-shock-buffer-frontend",
+  "private": true,
+  "version": "0.2.0",
+  "description": "Static gamma shock buffer UI with zero external npm dependencies",
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "test": "node -e \"console.log('no frontend npm deps to install')\""
   }
 }
