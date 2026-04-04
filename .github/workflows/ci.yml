@@ -21,12 +21,15 @@ jobs:
           cache: npm
 
       - name: Install dependencies
+        if: ${{ hashFiles('package.json') != '' }}
         run: npm ci
 
       - name: Lint
+        if: ${{ hashFiles('package.json') != '' }}
         run: npm run lint
 
       - name: Run tests
+        if: ${{ hashFiles('package.json') != '' }}
         run: npm test
 
       - name: Docker build (validation only)
