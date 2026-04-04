@@ -2,9 +2,8 @@ import { readFileSync, existsSync } from 'node:fs';
 
 const requiredFiles = [
   'package.json',
-  'frontend/package.json',
-  'frontend/index.html',
-  'frontend/src/app.js',
+  'index.html',
+  'src/app.js',
   'test/smoke.test.mjs',
 ];
 
@@ -16,19 +15,21 @@ for (const file of requiredFiles) {
 }
 
 const repoPkg = JSON.parse(readFileSync('package.json', 'utf8'));
-const frontendPkg = JSON.parse(readFileSync('frontend/package.json', 'utf8'));
-
 if (!repoPkg.scripts?.lint || !repoPkg.scripts?.test) {
   console.error('Root package.json must define lint and test scripts');
   process.exit(1);
 }
 
-if (!frontendPkg.scripts?.start) {
-  console.error('frontend/package.json must define a start script');
-  process.exit(1);
+// Keep nested frontend support for legacy paths while preferring repo-root frontend files.
+if (existsSync('frontend/package.json')) {
+  const frontendPkg = JSON.parse(readFileSync('frontend/package.json', 'utf8'));
+  if (!frontendPkg.scripts?.start) {
+    console.error('frontend/package.json exists but does not define a start script');
+    process.exit(1);
+  }
 }
 
-const app = readFileSync('frontend/src/app.js', 'utf8');
+const app = readFileSync('src/app.js', 'utf8');
 const checks = [
   ['title', 'GAMMA SHOCK BUFFER'],
   ['generator', 'genGEXStrikes'],

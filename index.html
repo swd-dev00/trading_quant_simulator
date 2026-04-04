@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TQS Gamma Shock Buffer</title>
+    <style>
+      body { margin:0; background:#0a0c10; color:#e2e5ea; font-family:'IBM Plex Mono', monospace; }
+      .app { padding:16px; }
+      .row { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:10px; margin:12px 0; }
+      .card { background:#111520; border:1px solid #1a1f2e; border-radius:6px; padding:10px; }
+      .label { color:#6b7280; font-size:10px; }
+      .bars { background:#0f1219; border:1px solid #1a1f2e; border-radius:6px; padding:8px; }
+      .bar-row { display:flex; align-items:center; gap:8px; margin:3px 0; }
+      .strike { width:64px; color:#8b95a5; font-size:11px; }
+      .bar-track { flex:1; background:#111520; height:10px; border-radius:6px; overflow:hidden; display:flex; }
+      .bar-neg { background:#ef4444; margin-left:auto; }
+      .bar-pos { background:#00e5a0; }
+      .mono { font-variant-numeric: tabular-nums; }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="app"></div>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

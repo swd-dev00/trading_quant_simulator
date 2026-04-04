@@ -11,14 +11,15 @@ test('fastapi entrypoint exists', () => {
   assert.match(source, /FastAPI/);
 });
 
-test('gamma shock buffer static app exists and includes expected heading', () => {
-  assert.equal(existsSync('frontend/src/app.js'), true);
-  const source = readFileSync('frontend/src/app.js', 'utf8');
+test('gamma shock buffer frontend exists in repo root and includes expected heading', () => {
+  assert.equal(existsSync('src/app.js'), true);
+  assert.equal(existsSync('index.html'), true);
+  const source = readFileSync('src/app.js', 'utf8');
   assert.match(source, /GAMMA SHOCK BUFFER/);
 });
 
 test('gamma helpers expose deterministic shape and flip detection', () => {
-  const { genGEXStrikes, findFlipStrike } = require('../frontend/src/app.js');
+  const { genGEXStrikes, findFlipStrike } = require('../src/app.js');
   const sample = genGEXStrikes(100, 7);
 
   assert.equal(sample.length, 7);
