@@ -55,6 +55,15 @@ jobs:
       - name: Run tests
         if: ${{ env.PROJECT_DIR != '' }}
         working-directory: ${{ env.PROJECT_DIR }}
+        if: ${{ hashFiles('package.json') != '' }}
+        run: npm ci
+
+      - name: Lint
+        if: ${{ hashFiles('package.json') != '' }}
+        run: npm run lint
+
+      - name: Run tests
+        if: ${{ hashFiles('package.json') != '' }}
         run: npm test
 
       - name: Docker build (validation only)
