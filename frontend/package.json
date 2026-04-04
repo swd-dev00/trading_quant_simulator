@@ -1,4 +1,20 @@
 {
+  "name": "trading-quant-simulator-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.15.4"
+  },
+  "devDependencies": {
+    "vite": "^5.4.19"
   "name": "tqs-gamma-shock-buffer-frontend",
   "private": true,
   "version": "0.2.0",

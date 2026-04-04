@@ -1,6 +1,10 @@
 import { readFileSync, existsSync } from 'node:fs';
 
 const requiredFiles = [
+  'frontend/package.json',
+  'frontend/index.html',
+  'frontend/src/main.jsx',
+  'frontend/src/App.jsx',
   'package.json',
   'index.html',
   'src/app.js',
@@ -14,6 +18,12 @@ for (const file of requiredFiles) {
   }
 }
 
+const app = readFileSync('frontend/src/App.jsx', 'utf8');
+const checks = [
+  ['title', 'GAMMA SHOCK BUFFER'],
+  ['chart', 'BarChart'],
+  ['flip', 'findFlipStrike'],
+  ['memoized data', 'useMemo(() => genGEXStrikes(spot), [spot])'],
 const repoPkg = JSON.parse(readFileSync('package.json', 'utf8'));
 if (!repoPkg.scripts?.lint || !repoPkg.scripts?.test) {
   console.error('Root package.json must define lint and test scripts');

@@ -11,6 +11,11 @@ test('fastapi entrypoint exists', () => {
   assert.match(source, /FastAPI/);
 });
 
+test('gamma shock buffer app exists and includes expected heading', () => {
+  assert.equal(existsSync('frontend/src/App.jsx'), true);
+  const source = readFileSync('frontend/src/App.jsx', 'utf8');
+  assert.match(source, /GAMMA SHOCK BUFFER/);
+});
 test('gamma shock buffer frontend exists in repo root and includes expected heading', () => {
   assert.equal(existsSync('src/app.js'), true);
   assert.equal(existsSync('index.html'), true);
